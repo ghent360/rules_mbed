@@ -21,13 +21,6 @@ BAZEL_VERSION_SHA = "1a64c807716e10c872f1618852d95f4893d81667fe6e691ef696489103c
 
 load("//:rules.bzl", "mbed_register")
 load("//tools/workspace/mbed:repository.bzl", "mbed_repository")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-http_archive(
-    name = "rules_cc",
-    urls = ["https://github.com/bazelbuild/rules_cc/archive/TODO"],
-    sha256 = "TODO",
-)
 
 mbed_register()
 
