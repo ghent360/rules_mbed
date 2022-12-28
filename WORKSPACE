@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-workspace(name = "com_github_mjbots_rules_mbed")
+workspace(name = "com_github_ghent360_rules_mbed")
 
 BAZEL_VERSION = "3.4.1"
 BAZEL_VERSION_SHA = "1a64c807716e10c872f1618852d95f4893d81667fe6e691ef696489103c9b460"
