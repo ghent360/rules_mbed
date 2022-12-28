@@ -551,6 +551,19 @@ def _stm32_impl(ctx):
         implies = ["stm32"],
     )
 
+    stm32f1_feature = feature(
+        name = "stm32f1",
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-mcpu=cortex-m3",
+                ])],
+            ),
+        ],
+        implies = ["stm32"],
+    )
+
     stm32f4_feature = feature(
         name = "stm32f4",
         flag_sets = [
@@ -659,6 +672,7 @@ cc_toolchain_config_stm32 = rule(
     attrs = {
         "cpu": attr.string(mandatory = True, values = [
             "stm32f0",
+            "stm32f1",
             "stm32f4",
             "stm32g4",
         ]),

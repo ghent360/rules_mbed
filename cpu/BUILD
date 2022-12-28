@@ -22,6 +22,11 @@ constraint_value(
 )
 
 constraint_value(
+    name = "stm32f1",
+    constraint_setting = "@platforms//cpu:cpu",
+)
+
+constraint_value(
     name = "stm32f4",
     constraint_setting = "@platforms//cpu:cpu",
 )

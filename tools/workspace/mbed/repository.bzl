@@ -132,6 +132,15 @@ def _get_target_defines(repository_ctx, target_path):
                     "TARGET_CORTEX_M",
                     "TARGET_CORTEX",
                 ]
+            elif core == 'Cortex-M3':
+                this_stack[0] += [
+                    "ARM_MATH_CM3",
+                    "__CORTEX_M3",
+                    "TARGET_LIKE_CORTEX_M3",
+                    "TARGET_M3",
+                    "TARGET_CORTEX_M",
+                    "TARGET_CORTEX",
+                ]
             elif core == 'Cortex-M0':
                 this_stack[0] += [
                     "ARM_MATH_CM0",
@@ -251,6 +260,10 @@ def _impl(repository_ctx):
         if "TARGET_M4" in defines:
             src_globs += [
                 "rtos/TARGET_CORTEX/rtx5/RTX/Source/TOOLCHAIN_GCC/TARGET_RTOS_M4_M7/*.S",
+            ]
+        elif "TARGET_M3" in defines:
+            src_globs += [
+                "rtos/TARGET_CORTEX/rtx5/RTX/Source/TOOLCHAIN_GCC/TARGET_RTOS_M3/*.S",
             ]
         elif "TARGET_M0" in defines:
             src_globs += [
