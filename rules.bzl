@@ -20,8 +20,8 @@ def mbed_register(config = DEFAULT_CONFIG):
     add_default_repositories(config=config)
 
     native.register_toolchains(
-        "@com_github_mjbots_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f0",
-        "@com_github_mjbots_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f1",
-        "@com_github_mjbots_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f4",
-        "@com_github_mjbots_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32g4",
+        "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f0",
+        "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f1",
+        "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f4",
+        "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32g4",
     )
