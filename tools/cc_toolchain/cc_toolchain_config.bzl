@@ -619,6 +619,7 @@ def _stm32_impl(ctx):
         common_feature,
         stm32_feature,
         stm32f0_feature,
+        stm32f1_feature,
         stm32f4_feature,
         stm32g4_feature,
     ]
