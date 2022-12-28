@@ -603,6 +603,7 @@ def _stm32_impl(ctx):
             "novolatileerror",
             "no-type-limits",
         ] + (["stm32f0"] if ctx.attr.cpu == "stm32f0" else []) + (
+             ["stm32f1"] if ctx.attr.cpu == "stm32f1" else []) + (
              ["stm32f4"] if ctx.attr.cpu == "stm32f4" else []) + (
              ["stm32g4"] if ctx.attr.cpu == "stm32g4" else [])
     )
