@@ -275,7 +275,7 @@ def _impl(repository_ctx):
             ]
         elif "TARGET_M0P" in defines:
             src_globs += [
-                "rtos/TARGET_CORTEX/rtx5/RTX/Source/TOOLCHAIN_GCC/TARGET_RTOS_M0/*.S",
+                "rtos/TARGET_CORTEX/rtx5/RTX/Source/TOOLCHAIN_GCC/TARGET_RTOS_M0P/*.S",
             ]
         elif "TARGET_M0" in defines:
             src_globs += [
