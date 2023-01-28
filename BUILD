@@ -41,6 +41,14 @@ platform(
 )
 
 platform(
+    name = "stm32g0",
+    constraint_values = [
+        "@platforms//os:none",
+        "//cpu:stm32g0",
+    ],
+)
+
+platform(
     name = "stm32g4",
     constraint_values = [
         "@platforms//os:none",

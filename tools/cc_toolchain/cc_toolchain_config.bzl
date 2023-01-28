@@ -578,6 +578,19 @@ def _stm32_impl(ctx):
         implies = ["stm32"],
     )
 
+    stm32g0_feature = feature(
+        name = "stm32g0",
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-mcpu=cortex-m0plus",
+                ])],
+            ),
+        ],
+        implies = ["stm32"],
+    )
+
     stm32g4_feature = feature(
         name = "stm32g4",
         flag_sets = [
@@ -605,6 +618,7 @@ def _stm32_impl(ctx):
         ] + (["stm32f0"] if ctx.attr.cpu == "stm32f0" else []) + (
              ["stm32f1"] if ctx.attr.cpu == "stm32f1" else []) + (
              ["stm32f4"] if ctx.attr.cpu == "stm32f4" else []) + (
+             ["stm32g0"] if ctx.attr.cpu == "stm32g0" else []) + (
              ["stm32g4"] if ctx.attr.cpu == "stm32g4" else [])
     )
 
@@ -622,6 +636,7 @@ def _stm32_impl(ctx):
         stm32f0_feature,
         stm32f1_feature,
         stm32f4_feature,
+        stm32g0_feature,
         stm32g4_feature,
     ]
 
@@ -676,6 +691,7 @@ cc_toolchain_config_stm32 = rule(
             "stm32f0",
             "stm32f1",
             "stm32f4",
+            "stm32g0",
             "stm32g4",
         ]),
         "builtin_include_directories": attr.string_list(),

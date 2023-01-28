@@ -23,5 +23,6 @@ def mbed_register(config = DEFAULT_CONFIG):
         "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f0",
         "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f1",
         "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32f4",
+        "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32g0",
         "@com_github_ghent360_rules_mbed//tools/cc_toolchain:cc_toolchain_stm32g4",
     )

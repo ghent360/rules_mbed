@@ -26,6 +26,7 @@ cc_toolchain_suite(
     name = "toolchain",
     toolchains = {
         "stm32g4|compiler": "gcc-stm32g4",
+        "stm32g0|compiler": "gcc-stm32g0",
         "stm32f4|compiler": "gcc-stm32f4",
         "stm32f1|compiler": "gcc-stm32f1",
         "stm32f0|compiler": "gcc-stm32f0",
@@ -157,6 +158,45 @@ toolchain(
     toolchain = ":gcc-stm32f4",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
+
+cc_toolchain_config_stm32(
+    name = "gcc-stm32g0-config",
+    cpu = "stm32g0",
+    toolchain_identifier = "gcc-stm32g0",
+    host_compiler_prefix = "wrapper",
+    host_compiler_path = "wrapper/arm-none-eabi-g++",
+    builtin_include_directories = [
+        "external/com_arm_developer_gcc/arm-none-eabi/include/",
+        "external/com_arm_developer_gcc/arm-none-eabi/include/sys/",
+    ],
+)
+
+cc_toolchain(
+    name = "gcc-stm32g0",
+    all_files = ":arm_everything",
+    compiler_files = ":arm_everything",
+    dwp_files = ":arm_everything",
+    linker_files = ":arm_everything",
+    objcopy_files = ":arm_everything",
+    strip_files = ":arm_everything",
+    ar_files = ":arm_everything",
+    as_files = ":arm_everything",
+    supports_param_files = 0,
+    toolchain_config = ":gcc-stm32g0-config",
+)
+
+toolchain(
+    name = "cc_toolchain_stm32g0",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+    ],
+    target_compatible_with = [
+        "//cpu:stm32g0",
+    ],
+    toolchain = ":gcc-stm32g0",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
 
 cc_toolchain_config_stm32(
     name = "gcc-stm32g4-config",
