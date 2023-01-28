@@ -51,13 +51,13 @@ cc_library(
 
 genrule(
     name = "preprocess_linker_script",
-    srcs = ["linker_script.ld.in"],
+    srcs = ["@LINKER_SCRIPT@", "@LINKER_DEPS@"],
     outs = ["linker_script.ld"],
     tools = [
         "@com_arm_developer_gcc//:everything",
         "@com_arm_developer_gcc//:cpp",
     ],
-    cmd = "$(location @com_arm_developer_gcc//:cpp) -P {} $< -o $@".format(
+    cmd = "$(location @com_arm_developer_gcc//:cpp) -P {} $(location @LINKER_SCRIPT@) -o $@".format(
         " ".join(["-D{}".format(x) for x in @DEFINES@
                   if x.find('|') == -1])),
 )

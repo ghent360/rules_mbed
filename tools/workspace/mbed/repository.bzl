@@ -45,11 +45,16 @@ DEFAULT_CONFIG = {
     "MBED_CONF_PLATFORM_STDIO_FLUSH_AT_EXIT": "1",
     "MBED_CONF_RTOS_IDLE_THREAD_STACK_SIZE": "512",
     "MBED_CONF_RTOS_MAIN_THREAD_STACK_SIZE": "4096",
-    "MBED_CONF_RTOS_PRESENT" : "1",
+    "MBED_CONF_RTOS_PRESENT" : "true",
     "MBED_CONF_RTOS_THREAD_STACK_SIZE": "4096",
     "MBED_CONF_RTOS_TIMER_THREAD_STACK_SIZE": "768",
     "MBED_CONF_TARGET_LPUART_CLOCK_SOURCE": "USE_LPUART_CLK_LSE|USE_LPUART_CLK_PCLK1",
     "MBED_CONF_TARGET_LSE_AVAILABLE": "1",
+    "MBED_CONF_TARGET_RTC_CLOCK_SOURCE": "USE_RTC_CLK_LSI",
+    "MBED_CONF_TARGET_DEEP_SLEEP_LATENCY": "0",
+    "MBED_CONF_TARGET_DEFAULT_ADC_VREF": "3.3f",
+    "MBED_CONF_TARGET_I2C_TIMING_VALUE_ALGO": "0",
+    "MBED_CRC_TABLE_SIZE": "16",
     "MEM_ALLOC": "malloc",
     "MEM_FREE": "free",
 }
@@ -73,7 +78,6 @@ def _get_target_defines(repository_ctx, target_path):
         fail("Final target directory does not start with TARGET_")
 
     first_target = target_name.split("TARGET_")[1]
-
 
     targets_results = repository_ctx.execute(["cat", "targets/targets.json"])
     if targets_results.return_code != 0:
@@ -183,7 +187,6 @@ def _get_target_defines(repository_ctx, target_path):
 
     return sorted(result.keys())
 
-
 def _impl(repository_ctx):
     PREFIX = "external/{}".format(repository_ctx.name)
 
@@ -213,30 +216,31 @@ def _impl(repository_ctx):
 
     defines = ["{}={}".format(key, value)
                for key, value in my_config.items()
-               if value != "0"]
+               if value != "<undefined>"]
 
     defines += _get_target_defines(repository_ctx, target)
 
     for key, value in my_config.items():
-        if value != "0":
+        if value != "<undefined>":
             continue
 
         if key in defines:
             defines.remove(key)
 
-
     hdr_globs = [
         "mbed.h",
-        "platform/**/*.h",
-        "drivers/*.h",
-        "cmsis/*.h",
-        "cmsis/TARGET_CORTEX_M/*.h",
-        "events/*.h",
-        "events/equeue/*.h",
-        "hal/*.h",
+        "platform/cxxsupport/*",
+        "platform/source/*.h",
+        "platform/include/platform/*.h",
+        "platform/include/platform/internal/*.h",
+        "drivers/include/drivers/*.h",
+        "drivers/include/drivers/interfaces/*.h",
+        "cmsis/CMSIS_5/CMSIS/TARGET_CORTEX_M/Include/*.h",
+        "events/include/events/*.h",
+        "hal/include/hal/*.h",
     ]
 
-    enable_rtos = int(my_config["MBED_CONF_RTOS_PRESENT"]) != 0
+    enable_rtos = my_config["MBED_CONF_RTOS_PRESENT"] != "<undefined>"
 
     if enable_rtos:
         hdr_globs += [
@@ -245,12 +249,13 @@ def _impl(repository_ctx):
         ]
 
     src_globs = [
-        "platform/**/*.c",
-        "platform/**/*.cpp",
-        "drivers/*.cpp",
-        "cmsis/TARGET_CORTEX_M/*.c",
-        "hal/*.c",
-        "hal/*.cpp",
+        "platform/source/*.c",
+        "platform/source/TARGET_CORTEX_M/*.c",
+        "platform/source/*.cpp",
+        "drivers/source/*.cpp",
+        "cmsis/CMSIS_5/CMSIS/TARGET_CORTEX_M/Source/*.c",
+        "hal/source/*.c",
+        "hal/source/*.cpp",
     ]
 
     if enable_rtos:
@@ -287,11 +292,16 @@ def _impl(repository_ctx):
 
     includes = [
         ".",
-        "platform",
-        "drivers",
-        "cmsis/TARGET_CORTEX_M",
-        "cmsis".format(PREFIX),
-        "hal".format(PREFIX),
+        "platform/cxxsupport",
+        "platform/source",
+        "platform/include",
+        "platform/include/platform",
+        "platform/include/platform/internal",
+        "drivers/include",
+        "drivers/include/drivers",
+        "cmsis/CMSIS_5/CMSIS/TARGET_CORTEX_M/Include",
+        "hal/include",
+        "hal/include/hal",
     ]
 
     if enable_rtos:
@@ -325,20 +335,55 @@ def _impl(repository_ctx):
     # we'll just encode a maximum size that is way more than enough.
     # Go Starlark.
     for i in range(1000):
+        cube_fw = "{}/STM32Cube_FW".format(remaining_target)
+        if repository_ctx.path(cube_fw).exists:
+            hdr_globs += [
+                "{}/*.h".format(cube_fw),
+                "{}/CMSIS/*.h".format(cube_fw),
+            ]
+            includes += [
+                cube_fw,
+                "{}/CMSIS".format(cube_fw),
+            ]
+            find_result = repository_ctx.execute(["find", cube_fw, '-type', 'd', '-name', 'STM32*xx_HAL_Driver'])
+            if find_result.return_code == 0 and len(find_result.stdout) > 0:
+                hal_driver = find_result.stdout.strip()
+                includes += [
+                    hal_driver,
+                    "{}/Legacy".format(hal_driver),
+                ]
+                hdr_globs += [
+                    "{}/*.h".format(hal_driver),
+                    "{}/Legacy/*.h".format(hal_driver),
+                ]
+                src_globs += [
+                    "{}/*.c".format(hal_driver),
+                ]
+
         hdr_globs += [
             "{}/*.h".format(remaining_target),
-            "{}/device/*.h".format(remaining_target),
         ]
         src_globs += [
             "{}/*.c".format(remaining_target),
             "{}/*.cpp".format(remaining_target),
-            "{}/device/*.c".format(remaining_target),
-            "{}/device/TOOLCHAIN_GCC_ARM/*.S".format(remaining_target),
         ]
         includes += [
             remaining_target,
-            "{}/device".format(remaining_target),
+            "{}/TOOLCHAIN_GCC_ARM".format(remaining_target),
         ]
+
+        device = repository_ctx.path("{}/device".format(remaining_target))
+        if device.exists:
+            hdr_globs += [
+                "{}/device/*.h".format(remaining_target),
+            ]
+            src_globs += [
+                "{}/device/*.c".format(remaining_target),
+                "{}/device/TOOLCHAIN_GCC_ARM/*.S".format(remaining_target),
+            ]
+            includes += [
+                "{}/device".format(remaining_target),
+            ]
 
         # Does this directory contain the linker script?
 
@@ -346,6 +391,7 @@ def _impl(repository_ctx):
         find_result = repository_ctx.execute(["find", linker_search_path, '-name', '*.ld'])
         if find_result.return_code == 0 and len(find_result.stdout) > 0:
             linker_script = find_result.stdout.strip()
+            linker_deps = "{}/cmsis_nvic.h".format(remaining_target)
 
         items = remaining_target.rsplit('/', 1)
         if len(items) == 1:
@@ -363,6 +409,8 @@ def _impl(repository_ctx):
         '@INCLUDES@': _render_list(includes),
         '@COPTS@': _render_list(copts),
         '@DEFINES@': _render_list(defines),
+        '@LINKER_SCRIPT@': _escape(linker_script),
+        '@LINKER_DEPS@': _escape(linker_deps),
     }
 
     repository_ctx.template(
@@ -376,7 +424,7 @@ def _impl(repository_ctx):
         substitutions = substitutions,
     )
 
-    repository_ctx.symlink(linker_script, "linker_script.ld.in")
+    # repository_ctx.symlink(linker_script, "linker_script.ld.in")
 
 _mbed_repository = repository_rule(
     implementation = _impl,
