@@ -345,6 +345,9 @@ def _impl(repository_ctx):
                 cube_fw,
                 "{}/CMSIS".format(cube_fw),
             ]
+            src_globs += [
+                "{}/*.c".format(cube_fw),
+            ]
             find_result = repository_ctx.execute(["find", cube_fw, '-type', 'd', '-name', 'STM32*xx_HAL_Driver'])
             if find_result.return_code == 0 and len(find_result.stdout) > 0:
                 hal_driver = find_result.stdout.strip()
@@ -366,6 +369,7 @@ def _impl(repository_ctx):
         src_globs += [
             "{}/*.c".format(remaining_target),
             "{}/*.cpp".format(remaining_target),
+            "{}/TOOLCHAIN_GCC_ARM/*.S".format(remaining_target),
         ]
         includes += [
             remaining_target,
