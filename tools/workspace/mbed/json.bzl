@@ -142,6 +142,12 @@ def parse_json(text):
         current_type = result_stack[-1][0]
 
         if current_type == _TYPE_OBJECT_KEY:
+            if element == '}':
+                if len(result_stack) == 1:
+                    # We're done!
+                    return result_stack[0][1]
+                _incorporate_value(result_stack)
+                continue
             if element != '"':
                 continue
             result_stack.append([_TYPE_STRING, ""])
@@ -265,3 +271,9 @@ def parse_json(text):
                 result_stack[-1][0] = _TYPE_ARRAY
             else:
                 fail("Unexpected character: " + element)
+
+#debug stuff
+#import subprocess
+#targets_results = subprocess.run(['cat', '/home/vne/projects/mbed/mbed-os/targets/targets.json'], stdout=subprocess.PIPE)
+#targets = parse_json(targets_results.stdout)
+#print(targets)

@@ -191,7 +191,7 @@ def _impl(repository_ctx):
         url = [
             "https://github.com/ARMmbed/mbed-os/archive/mbed-os-6.16.0.tar.gz",
         ],
-        sha256 = "00000000000000000000000000000000000000000000000000000000000000000",
+        sha256 = "eebf04e6badd3a263d857b585718f0a282d16d01e24a1d88f247c76d1227150b",
         stripPrefix = "mbed-os-mbed-os-6.16.0",
     )
     patch(repository_ctx)
